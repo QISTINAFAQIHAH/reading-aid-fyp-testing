@@ -17,10 +17,12 @@
     </header>
 
     <!-- Input -->
+    <!--
     <div class="card">
         <label for="inputText">✏️ Enter your text</label>
         <textarea id="inputText" placeholder="Paste or type your text here…" oninput="run()"></textarea>
     </div>
+-->
 
     <!-- File Upload -->
     <div class="card">
@@ -133,6 +135,7 @@
                     <option value="Lexend">Lexend (Default)</option>
                     <option value="OpenDyslexic">OpenDyslexic</option>
                     <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
                 </select>
             </div>
             <div class="control-group">
@@ -143,7 +146,7 @@
                 </div>
             </div>
             <div class="control-group">
-                <label for="bgPicker">🖼️ Reading Background</label>
+                <label for="bgPicker">📖 Reading Background Color</label>
                 <div class="color-picker-row">
                     <input type="color" id="bgPicker" value="#f5f0e8" onchange="savePreferences()">
                     <span id="bgColorVal">#f5f0e8</span>

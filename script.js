@@ -40,8 +40,9 @@ function run() {
         renderPage();
         return;
     }
+    savePreferences();
 
-    let text = document.getElementById('inputText').value;
+ /*   let text = document.getElementById('inputText').value;
     text = text.replace(/\r\n/g, '\n')
                .replace(/\n{3,}/g, '\n\n')
                .replace(/[ \t]+/g, ' ')
@@ -55,7 +56,7 @@ function run() {
     document.getElementById('pageNav').style.display = 'none';
     output.innerText = text;
     applyOutputStyles(output);
-    savePreferences();
+    savePreferences();*/
 }
 
 // ─── APPLY STYLES TO OUTPUT ───────────────────────────────────────────────────
@@ -124,8 +125,12 @@ function changePage(direction) {
 // ─── FONT STYLE ───────────────────────────────────────────────────────────────
 function applyFont() {
     const font = document.getElementById('fontStyle').value;
-    document.getElementById('inputText').style.fontFamily = `'${font}', sans-serif`;
+
+    document.getElementById('output').style.fontFamily =
+        `'${font}', sans-serif`;
+
     localStorage.setItem('fontStyle', font);
+
     run();
 }
 
@@ -604,7 +609,7 @@ window.onload = function () {
     }
     if (savedFont) {
         document.getElementById('fontStyle').value = savedFont;
-        document.getElementById('inputText').style.fontFamily = `'${savedFont}', sans-serif`;
+        document.getElementById('output').style.fontFamily = `'${savedFont}', sans-serif`;
     }
     // FIX: restore font color properly
     if (savedColor) {
