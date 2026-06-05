@@ -1,0 +1,502 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Lexend', sans-serif;
+    background: #f5f0e8;
+    color: #2c2c2c;
+    min-height: 100vh;
+    padding: 32px 16px;
+}
+
+.container {
+    max-width: 780px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #3a3a3a;
+    letter-spacing: 0.5px;
+}
+
+header p {
+    margin-top: 6px;
+    font-size: 1rem;
+    color: #666;
+}
+
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+textarea {
+    width: 100%;
+    min-height: 130px;
+    padding: 14px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    letter-spacing: 0.03em;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    resize: vertical;
+    background: #fdfaf5;
+    color: #2c2c2c;
+    transition: border-color 0.2s, font-family 0.2s;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #7b9cdb;
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .controls-grid { grid-template-columns: 1fr; }
+}
+
+.control-group { display: flex; flex-direction: column; }
+
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+input[type="range"] {
+    flex: 1;
+    accent-color: #7b9cdb;
+    height: 6px;
+    cursor: pointer;
+}
+
+.slider-value {
+    min-width: 38px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    background: #f0f0f0;
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+.theme-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.theme-btn {
+    padding: 10px 18px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.1s;
+}
+
+.theme-btn:hover { transform: translateY(-1px); }
+.theme-btn.active { border-color: #7b9cdb; }
+
+.btn-normal   { background: #ffffff; color: #2c2c2c; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.btn-dark     { background: #1e1e2e; color: #e0e0e0; }
+.btn-soft     { background: #fdf6e3; color: #3a3000; }
+.btn-dyslexia { background: #fff3b0; color: #2c2000; }
+.btn-blue     { background: #ddeeff; color: #002244; }
+
+#output-section { display: none; }
+
+#output {
+    width: 100%;
+    min-height: 80px;
+    padding: 20px;
+    border-radius: 12px;
+    font-family: 'Lexend', sans-serif;
+    line-height: 1.8;
+    letter-spacing: 0.03em;
+    white-space: normal;
+    word-break: break-word;
+    transition: background 0.3s, color 0.3s, font-family 0.2s;
+    max-width: 600px;
+    margin: auto;
+    padding: 28px;
+    border-radius: 16px;
+
+    line-height: 1.8;
+
+    letter-spacing: 0.05em;  
+    word-spacing: 3px; 
+    letter-spacing: 0.04em;
+    word-spacing: 2px;
+
+    box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    font-family: 'Lexend', 'OpenDyslexic', Arial, sans-serif;
+}
+
+.run-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #7b9cdb;
+    color: #fff;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-bottom: 24px;
+}
+
+.run-btn:hover { background: #5a7fc4; transform: translateY(-1px); }
+
+input[type="file"] {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    border: 2px dashed #bbb;
+    border-radius: 10px;
+    background: #fdfaf5;
+    cursor: pointer;
+    width: 100%;
+    color: #555;
+    transition: border-color 0.2s;
+}
+
+input[type="file"]:hover {
+    border-color: #7b9cdb;
+}
+
+select {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fdfaf5;
+    color: #2c2c2c;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+}
+
+select:focus {
+    outline: none;
+    border-color: #7b9cdb;
+}
+
+/* ── Sub-label ─────────────────────────────────────────────────────────────── */
+.sub-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 6px;
+    margin-top: 14px;
+    display: block;
+}
+
+/* ── Page range row ─────────────────────────────────────────────────────────── */
+.page-range-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.page-range-row .control-group {
+    flex: 1;
+    min-width: 80px;
+}
+
+input[type="number"] {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fdfaf5;
+    color: #2c2c2c;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: #7b9cdb;
+}
+
+input[type="number"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Checkbox group ─────────────────────────────────────────────────────────── */
+.checkbox-group {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #7b9cdb;
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+/* ── Color picker ───────────────────────────────────────────────────────────── */
+.color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+input[type="color"] {
+    width: 48px;
+    height: 44px;
+    padding: 2px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fdfaf5;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+input[type="color"]:hover {
+    border-color: #7b9cdb;
+}
+
+#fontColorVal {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    background: #f0f0f0;
+    border-radius: 6px;
+    padding: 4px 10px;
+}
+
+/* ── Output header ──────────────────────────────────────────────────────────── */
+.output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.output-header label {
+    margin-bottom: 0;
+}
+
+/* ── Page navigation ────────────────────────────────────────────────────────── */
+.page-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 12px;
+}
+
+.nav-btn {
+    padding: 10px 20px;
+    background: #7b9cdb;
+    color: #fff;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: #5a7fc4;
+    transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.page-status {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #555;
+    text-align: center;
+    flex: 1;
+}
+
+/* ── Force OCR checkbox row ─────────────────────────────────────────────────── */
+.ocr-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ocr-checkbox-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+    flex-shrink: 0;
+}
+
+.ocr-label {
+    display: inline;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* ── OCR progress bar ───────────────────────────────────────────────────────── */
+.ocr-status {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #f0f4ff;
+    border: 2px solid #c0d0f0;
+    border-radius: 10px;
+}
+
+.ocr-status-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #3a5aad;
+    margin-bottom: 8px;
+}
+
+.ocr-progress-track {
+    width: 100%;
+    height: 8px;
+    background: #d0dcf5;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.ocr-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #7b9cdb;
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}
+
+/* ── Word document HTML output styles ──────────────────────────────────────── */
+#output h1 {
+    font-size: 1.6em;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#output h2 {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+#output h3 {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+#output p {
+    margin-bottom: 18px;
+}
+
+#output ul,
+#output ol {
+    padding-left: 1.6em;
+    margin-bottom: 16px;
+}
+
+#output li {
+    margin-bottom: 6px;
+}
+
+/* ── Website URL input ──────────────────────────────────────────────────────── */
+input[type="text"] {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fdfaf5;
+    color: #2c2c2c;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #7b9cdb;
+}
+
+/* ── Extract button ─────────────────────────────────────────────────────────── */
+.extract-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    background: #7b9cdb;
+    color: #fff;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.extract-btn:hover {
+    background: #5a7fc4;
+    transform: translateY(-1px);
+}
+
+/* ── Readability badge in output header ─────────────────────────────────────── */
+.page-indicator {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    background: #f0f0f0;
+    border-radius: 20px;
+    padding: 4px 12px;
+}

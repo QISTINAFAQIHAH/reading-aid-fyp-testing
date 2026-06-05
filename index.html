@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qis's FYP – Reading Aid</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <h1>📖 Reading Aid</h1>
+        <p>Customise your reading experience</p>
+    </header>
+
+    <!-- Input -->
+    <div class="card">
+        <label for="inputText">✏️ Enter your text</label>
+        <textarea id="inputText" placeholder="Paste or type your text here…" oninput="run()"></textarea>
+    </div>
+
+    <!-- File Upload -->
+    <div class="card">
+        <label for="fileInput">📂 Upload a document</label>
+
+        <label class="sub-label" for="docType">Document Type</label>
+        <select id="docType" onchange="togglePageRange()">
+          <!--  <option value="txt">Text (.txt)</option> -->
+            <option value="pdf">PDF (.pdf)</option>
+            <option value="docx">Word (.docx)</option>
+            <!--
+            <option value="web">Website (URL)</option>
+        -->
+        </select>
+
+        <input type="file" id="fileInput" accept=".pdf,.docx" onchange="loadFile(event)" style="margin-top:14px;">
+
+        <!-- Website URL input (shown only for web) -->
+        <!--
+        <div id="webSection" style="display:none; margin-top:14px;">
+            <label class="sub-label" for="websiteURL">🌐 Website URL</label>
+            <input type="text" id="websiteURL" placeholder="https://example.com/article" autocomplete="off">
+            <button class="extract-btn" onclick="loadWebsite()">Extract Content</button>
+        </div>
+    -->
+
+        <!-- Force OCR / ML controls (hidden – selection is now automatic) -->
+        <div id="forceOCRSection" style="display:none;">
+            <div class="ocr-checkbox-row">
+                <input type="checkbox" id="forceOCR">
+                <label for="forceOCR" class="ocr-label">🔍 Force OCR (for scanned PDFs)</label>
+            </div>
+        </div>
+        <input type="checkbox" id="useML" style="display:none;">
+        <label for="useML" style="display:none;">Use AI-enhanced extraction</label>
+
+        <!-- PDF/Word Page Range -->
+        <div id="pageRangeSection" style="display:none; margin-top:16px;">
+            <label class="sub-label">📄 Page Range</label>
+            <div class="page-range-row">
+                <div class="control-group">
+                    <label for="startPage">Start Page</label>
+                    <input type="number" id="startPage" min="1" value="1" placeholder="1">
+                </div>
+                <div class="control-group">
+                    <label for="endPage">End Page</label>
+                    <input type="number" id="endPage" min="1" placeholder="Last">
+                </div>
+                <div class="control-group checkbox-group">
+                    <label for="allPages">All Pages</label>
+                    <input type="checkbox" id="allPages" onchange="togglePageInputs()">
+                </div>
+            </div>
+            <button id="applyWordRange"
+                    class="extract-btn" 
+                    onclick="applyWordPageRange()" 
+                    style="display:none; margin-top:12px;">
+                    Apply Page Range
+                </button>
+
+                <button id="processBtn"
+                    class="extract-btn"
+                    style="display:none; margin-top:12px;">
+                Process PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="card">
+        <div class="controls-grid">
+
+            <div class="control-group">
+                <label for="fontSize">🔡 Font Size: <span id="fontSizeVal">20</span>px</label>
+                <div class="slider-row">
+                    <input type="range" id="fontSize" min="12"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    max="40" value="20"
+                           oninput="document.getElementById('fontSizeVal').textContent=this.value; run()">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="spacing">↕️ Line Spacing: <span id="spacingVal">1.8</span></label>
+                <div class="slider-row">
+                    <input type="range" id="spacing" min="1" max="3" step="0.1" value="1.8"
+                           oninput="document.getElementById('spacingVal').textContent=parseFloat(this.value).toFixed(1); run()">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Theme -->
+    <div class="card">
+        <label>🎨 Theme</label>
+        <div class="theme-buttons">
+            <button class="theme-btn btn-normal active"   onclick="setTheme('normal',this)">Normal</button>
+            <button class="theme-btn btn-dark"            onclick="setTheme('dark',this)">Dark</button>
+            <button class="theme-btn btn-soft"            onclick="setTheme('soft',this)">Soft Yellow</button>
+            <button class="theme-btn btn-dyslexia"        onclick="setTheme('dyslexia',this)">Dyslexia Friendly</button>
+            <button class="theme-btn btn-blue"            onclick="setTheme('blue',this)">Calm Blue</button>
+        </div>
+    </div>
+
+    <!-- Font Style + Color -->
+    <div class="card">
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="fontStyle">🔤 Font Style</label>
+                <select id="fontStyle" onchange="applyFont()">
+                    <option value="Lexend">Lexend (Default)</option>
+                    <option value="OpenDyslexic">OpenDyslexic</option>
+                    <option value="Arial">Arial</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="fontColor">🎨 Font Color</label>
+                <div class="color-picker-row">
+                    <input type="color" id="fontColor" value="#2c2c2c"   onchange="savePreferences(); run();">
+                    <span id="fontColorVal">#2c2c2c</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="bgPicker">🖼️ Reading Background</label>
+                <div class="color-picker-row">
+                    <input type="color" id="bgPicker" value="#f5f0e8" onchange="savePreferences()">
+                    <span id="bgColorVal">#f5f0e8</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Output -->
+    <div class="card" id="output-section">
+        <div class="output-header">
+            <label>📄 Output</label>
+            <span id="pageIndicator" class="page-indicator"></span>
+        </div>
+        <!-- OCR progress bar -->
+        <div id="ocrStatus" class="ocr-status" style="display:none;">
+            <div class="ocr-status-text" id="ocrStatusText">Processing…</div>
+            <div class="ocr-progress-track"><div class="ocr-progress-bar" id="ocrProgressBar"></div></div>
+        </div>
+        <div id="output"></div>
+        <div id="pageNav" class="page-nav" style="display:none;">
+            <button id="prevBtn" class="nav-btn" onclick="changePage(-1)" disabled>← Previous</button>
+            <span id="pageStatus" class="page-status">Page 1 of 1</span>
+            <button id="nextBtn" class="nav-btn" onclick="changePage(1)">Next →</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script> -->
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
