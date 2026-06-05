@@ -101,9 +101,10 @@ function renderPage() {
     if (isHtml) {
         output.innerHTML = text;
     } else {
-        output.innerHTML = text.split(/\n{1,2}/)
+        // Split on double newlines to preserve paragraph breaks; single newlines stay within paragraph
+        output.innerHTML = text.split(/\n\n+/)
             .filter(p => p.trim())
-            .map(p => `<p>${p}</p>`)
+            .map(p => `<p>${p.replace(/\n/g, ' ').trim()}</p>`)
             .join('');
     }
 
@@ -138,8 +139,22 @@ function applyFont() {
 function togglePageRange() {
     const docType = document.getElementById('docType').value;
     const isPdf   = docType === 'pdf';
-    /*const isWeb   = docType === 'web';*/
     const isDocx  = docType === 'docx';
+
+    // Reset state when document type changes
+    pdfPages    = [];
+    wordAllPages = [];
+    currentPage = 0;
+    window.pendingPDF = null;
+
+    const fileInput = document.getElementById('fileInput');
+    fileInput.value = '';
+
+    document.getElementById('output').innerHTML            = '';
+    document.getElementById('output-section').style.display = 'none';
+    document.getElementById('pageNav').style.display        = 'none';
+    document.getElementById('pageStatus').textContent       = '';
+    document.getElementById('pageIndicator').textContent    = '';
 
     document.getElementById('pageRangeSection').style.display = (isPdf || isDocx) ? 'block' : 'none';
     document.getElementById('forceOCRSection').style.display  = 'none'; // always hidden (auto pipeline)
@@ -357,32 +372,41 @@ async function processWithML(file) {
 
 // ─── TEXT STANDARDISATION ────────────────────────────────────────────────────
 function standardiseText(raw) {
-    // Step 1: normalise line endings and collapse runs of blank lines
+    // Step 1: normalise line endings, preserve double-newline paragraph breaks
     let t = raw
         .replace(/\r\n/g, '\n')
         .replace(/\r/g, '\n')
         .replace(/\n{3,}/g, '\n\n');
 
-    // Step 2: merge lines that are clearly broken mid-sentence
-    // A line ending without sentence-ending punctuation is joined to the next
-    t = t.replace(/([^\n.!?])\n([^\n])/g, '$1 $2');
+    // Step 2: process each paragraph independently to avoid cross-paragraph merges
+    const paras = t.split('\n\n').map(para => {
+        let p = para;
 
-    // Step 3: collapse excessive spaces
-    t = t.replace(/[ \t]+/g, ' ');
+        // Fix word-split artefacts: "younge r" → "younger", "rainfores t" → "rainforest"
+        // Pattern: word chars, then a space before a single char that continues the word,
+        // followed by another space or end — only collapse when the isolated char is lowercase
+        p = p.replace(/([a-zA-Z]+) ([a-z])(?=\s|[.,!?]|$)/g, (match, word, lone) => {
+            // Only merge if lone char looks like a split-off suffix (not a real word)
+            if (lone.length === 1) return word + lone;
+            return match;
+        });
 
-    // Step 4: fix missing space after punctuation
-    t = t.replace(/([.,!?])([^\s\d])/g, '$1 $2');
+        // Collapse excessive spaces within a line
+        p = p.replace(/[ \t]+/g, ' ');
 
-    // Step 5: fix camelCase splits from PDF.js
-    t = t.replace(/([a-z])([A-Z])/g, '$1 $2');
+        // Fix missing space after punctuation
+        p = p.replace(/([.,!?])([^\s\d'"\)])/g, '$1 $2');
 
-    // Step 6: fix spaced-out capital letters (e.g. "H E L L O" → "HELLO")
-    t = t.replace(/\b(?:[A-Z] ){2,}[A-Z]\b/g, m => m.replace(/ /g, ''));
+        // Fix camelCase splits from PDF.js (e.g. "helloWorld" → "hello World")
+        p = p.replace(/([a-z])([A-Z])/g, '$1 $2');
 
-    // Step 7: final spacing cleanup
-    t = t.replace(/\s{2,}/g, ' ').trim();
+        // Fix spaced-out capital letters (e.g. "H E L L O" → "HELLO")
+        p = p.replace(/\b(?:[A-Z] ){2,}[A-Z]\b/g, m => m.replace(/ /g, ''));
 
-    return t;
+        return p.trim();
+    });
+
+    return paras.filter(p => p.length > 0).join('\n\n');
 }
 
 // ─── EXTRACTION QUALITY HEURISTICS ──────────────────────────────────────────
@@ -420,13 +444,44 @@ function isOCRPoor(text) {
 
 // ─── PER-PAGE EXTRACTION PIPELINE ────────────────────────────────────────────
 async function extractPageText(page, pageNum, endPage, progress, file) {
+    const content  = await page.getTextContent();
+    const viewport = page.getViewport({ scale: 1 });
+    const pageH    = viewport.height;
 
-    const content = await page.getTextContent();
-    const pdfText = content.items.map(item => item.str).join(' ');
+    // Group items into lines by their Y position (rounded to nearest 5px)
+    const lineMap = new Map();
+    for (const item of content.items) {
+        const y   = Math.round((pageH - item.transform[5]) / 5) * 5;
+        const key = y;
+        if (!lineMap.has(key)) lineMap.set(key, []);
+        lineMap.get(key).push(item.str);
+    }
+
+    // Sort lines top-to-bottom and join each line's words
+    const sortedKeys = [...lineMap.keys()].sort((a, b) => a - b);
+    const lines = sortedKeys.map(k => lineMap.get(k).join(' ').trim()).filter(l => l.length > 0);
+
+    // Detect paragraph breaks: gap between consecutive Y positions > 1.5× normal line gap
+    const yKeys   = sortedKeys;
+    const gaps    = [];
+    for (let i = 1; i < yKeys.length; i++) gaps.push(yKeys[i] - yKeys[i - 1]);
+    const medianGap = gaps.length ? [...gaps].sort((a,b)=>a-b)[Math.floor(gaps.length/2)] : 10;
+
+    const paragraphs = [];
+    let current = lines[0] || '';
+    for (let i = 1; i < lines.length; i++) {
+        const gap = yKeys[i] - yKeys[i - 1];
+        if (gap > medianGap * 1.5) {
+            paragraphs.push(current.trim());
+            current = lines[i];
+        } else {
+            current += ' ' + lines[i];
+        }
+    }
+    if (current.trim()) paragraphs.push(current.trim());
 
     console.log(`[PDF.js] Direct extraction — page ${pageNum}`);
-
-    return pdfText;
+    return paragraphs.join('\n\n');
 }
 
 // ─── PDF PROCESSING ───────────────────────────────────────────────────────────
